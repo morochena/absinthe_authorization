@@ -4,7 +4,7 @@ defmodule AbsintheAuth.Mixfile do
   @version "0.1.0"
 
   def project do
-    [app: :absinthe_auth,
+    [app: :blanka,
      version: @version,
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
@@ -14,11 +14,11 @@ defmodule AbsintheAuth.Mixfile do
 
 
   defp package do
-    [description: "Abinsthe Authorization",
+    [description: "Blanka - Abinsthe Authorization",
      files: ["lib", "priv", "mix.exs", "README*"],
      maintainers: ["Marcus Orochena"],
      licenses: ["BSD"],
-     links: %{github: "https://github.com/morochena/absinthe_authorization"}]
+     links: %{github: "https://github.com/morochena/blanka"}]
   end
 
 

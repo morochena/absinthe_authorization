@@ -10,10 +10,10 @@ defmodule User do
   defstruct id: 1, name: "user"
 end
 
-defmodule Absinthe.AuthTest do
+defmodule Blanka.AuthTest do
   use ExUnit.Case
-  use Absinthe.Auth
-  doctest Absinthe.Auth
+  use Blanka
+  doctest Blanka
 
   @fakedb [
     %{id: 1, name: "Bob", email: "bubba@foo.com", posts: nil},
@@ -55,7 +55,7 @@ defmodule Absinthe.AuthTest do
   authorize :user, %User{}, [:name, 
                               {:posts, [:title, :body, 
                                 {:comments, [:body]}]}]
-  authorize :user, &Absinthe.AuthTest.owns_resource/2 
+  authorize :user, &Blanka.AuthTest.owns_resource/2 
   authorize :user, %Mod{}, [:id, :name, {:company, [:name, :industry]}]
   authorize :user, %Admin{}
 
@@ -70,7 +70,7 @@ defmodule Absinthe.AuthTest do
     attributes = %{id: 1}
     info = %{context: %{current_user: nil}}
 
-    assert {:ok, user} = with_auth(:user, attributes, info, &Absinthe.AuthTest.user_resolver/2)
+    assert {:ok, user} = with_auth(:user, attributes, info, &Blanka.AuthTest.user_resolver/2)
     assert user.id == nil
     assert user.name == "Bob"
     assert user.email == nil
@@ -80,7 +80,7 @@ defmodule Absinthe.AuthTest do
     attributes = %{id: 2}
     info = %{context: %{current_user: %Admin{}}}
 
-    assert {:ok, user} = with_auth(:user, attributes, info, &Absinthe.AuthTest.user_resolver/2)
+    assert {:ok, user} = with_auth(:user, attributes, info, &Blanka.AuthTest.user_resolver/2)
     assert user.id == 2
     assert user.name == "Fred"
     assert user.email == "fredmeister@foo.com"
@@ -90,7 +90,7 @@ defmodule Absinthe.AuthTest do
     attributes = %{id: 4}
     info = %{context: %{current_user: %Mod{}}}
 
-    assert {:ok, user} = with_auth(:user, attributes, info, &Absinthe.AuthTest.user_resolver/2)
+    assert {:ok, user} = with_auth(:user, attributes, info, &Blanka.AuthTest.user_resolver/2)
     assert user.id == 4
     assert user.name == "Heinz"
     assert user.email == nil
@@ -103,7 +103,7 @@ defmodule Absinthe.AuthTest do
     attributes = %{id: 3}
     info = %{context: %{current_user: %User{}}}
 
-    assert {:ok, user} = with_auth(:user, attributes, info, &Absinthe.AuthTest.user_resolver/2)
+    assert {:ok, user} = with_auth(:user, attributes, info, &Blanka.AuthTest.user_resolver/2)
     assert user.id == nil
     assert user.name == "Greg"
     assert user.email == nil
@@ -113,7 +113,7 @@ defmodule Absinthe.AuthTest do
     attributes = %{id: 2}
     info = %{context: %{current_user: %User{id: 2}}}
 
-    assert {:ok, user} = with_auth(:user, attributes, info, &Absinthe.AuthTest.user_resolver/2)
+    assert {:ok, user} = with_auth(:user, attributes, info, &Blanka.AuthTest.user_resolver/2)
     assert user.id == 2
     assert user.name == "Fred"
     assert user.email == "fredmeister@foo.com"
