@@ -54,17 +54,19 @@ defmodule Blanka do
   @doc """
   Creates the authorization rules that are checked by with_auth. 
   
-  It's important to note that the last rule that matches will the current request will be the one that goes through.
+  It's important to note that rules are checked in reverse order to how they were declared (bottom-up) - the first rule that matches will be the one that is used.
   
   #### field (atom)
 
   The first parameter is an atom corresponds to the field in your schema. If you have multiple schemas with the same field (like a query and a mutation) - the authorization rules will apply to both.
 
-  #### pattern (struct or function)
+  #### pattern (struct, function or blank map)
 
   Structs are compared to info.context.current_user, assuming you followed the strategy outlined here.
 
   Functions have have access to resource and info parameter. Info is the same map that is passed in to the resolver. Resource is actually the result of the resolver returning as if it was authorized. Keep this in mind for mutations, I haven't figured out an elegant way to avoid this for now.
+
+  Blank maps will always match.
 
   #### whitelist (list)
 

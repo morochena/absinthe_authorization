@@ -1,6 +1,6 @@
 # Blanka
 
-[Documentation](https://hexdocs.pm/blanka)
+[Documentation](https://hexdocs.pm/blanka/0.1.0) | [Example Phoenix App](https://github.com/morochena/phoenix-authorization-example)
 
 Provides basic declarative authorization functionality to [Absinthe](https://github.com/absinthe-graphql/absinthe) based GraphQL APIs in Phoenix.
 

@@ -10,15 +10,17 @@ defmodule AbsintheAuth.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
-     docs: [main: "Blanka", # The main page in the docs
-     # logo: "path/to/logo.png",
-     extras: ["README.md"]]]
+     package: package(),
+     docs: [
+      main: "Blanka",
+      extras: ["README.md"]
+    ]]
   end
 
 
   defp package do
     [description: "Blanka - Abinsthe Authorization",
-     files: ["lib", "priv", "mix.exs", "README*"],
+     files: ["lib", "mix.exs", "README*"],
      maintainers: ["Marcus Orochena"],
      licenses: ["BSD"],
      links: %{github: "https://github.com/morochena/blanka"}]
