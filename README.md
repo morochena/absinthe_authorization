@@ -55,17 +55,17 @@ Wrap your resolvers with the `with_auth` function:
 
 This function creates the authorization rules that are checked by `with_auth`. It's imporrtant to note that rules are checked in descending order. The first rule that matches will the current request will be the one that goes through. 
 
-### field (atom)
+#### field (atom)
 
 The first parameter is an atom corresponds to the field in your schema. If you have multiple schemas with the same field (like a query and a mutation) - the authorization rules will apply to both.
 
-### pattern (struct or function)
+#### pattern (struct or function)
 
 Structs are compared to `info.context.current_user`, assuming you followed the strategy outlined [here](http://absinthe-graphql.org/guides/context-and-authentication/).
 
 Functions have have access to `resource` and `info` parameter. Info is the same map that is passed in to the resolver. Resource is actually the result of the resolver returning as if it was authorized. Keep this in mind for mutations, I haven't figured out an elegant way to avoid this for now. 
 
-### whitelist (list)
+#### whitelist (list)
 
 If specified, the whitelist nils any values from the result of the resolver if they do not match the structure of the list provided. If the result is a list, it will apply it to all objects in the list.
 
@@ -118,5 +118,5 @@ authorize :user, %User{}, [:name, {:posts, [:title, :body, {:comments, [:body]}]
   ],
   company: nil
 }
-``
+```
 
