@@ -53,70 +53,42 @@ end
 
 `authorize(field, pattern, whitelist // [])` 
 
-This function creates the authorization rules that are checked by `with_auth`. It's imporrtant to note that rules are checked in descending order. The first rule that matches will the current request will be the one that goes through. 
+This function creates the authorization rules that are checked by `with_auth`. It's important to note that rules are checked in reverse order to how they were declared (bottom-up) - the first rule that matches will be the one that is used.
 
 #### field (atom)
 
 The first parameter is an atom corresponds to the field in your schema. If you have multiple schemas with the same field (like a query and a mutation) - the authorization rules will apply to both.
 
-#### pattern (struct or function)
+#### pattern (struct, function or blank map)
 
-Structs are compared to `info.context.current_user`, assuming you followed the strategy outlined [here](http://absinthe-graphql.org/guides/context-and-authentication/).
+Structs are compared to info.context.current_user, assuming you followed the strategy outlined here.
 
-Functions have have access to `resource` and `info` parameter. Info is the same map that is passed in to the resolver. Resource is actually the result of the resolver returning as if it was authorized. Keep this in mind for mutations, I haven't figured out an elegant way to avoid this for now. 
+Functions have have access to resource and info parameter. Info is the same map that is passed in to the resolver. Resource is actually the result of the resolver returning as if it was authorized. Keep this in mind for mutations, I haven't figured out an elegant way to avoid this for now.
+
+Blank maps will always match.
 
 #### whitelist (list)
 
 If specified, the whitelist nils any values from the result of the resolver if they do not match the structure of the list provided. If the result is a list, it will apply it to all objects in the list.
 
-``` elixir
-# given a rule like this
-authorize :user, %User{}, [:name, {:posts, [:title, :body, {:comments, [:body]}]}]
+Simple Example:
 
-# applied to this
+``` elixir
+authorize :user, %{}, [:name, :username]
+
+# result from resolver
 %{
-  id: 3, 
-  name: "Greg", 
-  email: "climbingreg@foo.com", 
-  posts: [
-    %{
-      id: 1,
-      title: "This is my first post!", 
-      body: "This is the best post ever!",
-      comments: [
-        %{
-          id: 555,
-          body: "This is an interesting comment"
-        }
-      ]
-    }
-  ],
-  company: %{
-    id: 200, 
-    name: "Foo Productions",
-    industry: "Film"
-  }
+  id: 3,
+  name: "Greg",
+  email: "climbinggreg@foo.com",
+  username: "climber_guy123"
 }
 
-# will result in
+# filtered result
 %{
-  id: nil, 
-  name: "Greg", 
-  email: nil, 
-  posts: [
-    %{
-      id: nil,
-      title: "This is my first post!", 
-      body: "This is the best post ever!",
-      comments: [
-        %{
-          id: nil,
-          body: "This is an interesting comment"
-        }
-      ]
-    }
-  ],
-  company: nil
+  id: nil,
+  name: "Greg",
+  email: nil,
+  username: "climber_guy123"
 }
 ```
-
