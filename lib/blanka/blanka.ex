@@ -51,13 +51,103 @@ defmodule Blanka do
     end
   end
 
-  defmacro authorize(field, pattern) do
-    quote do
-      @white_list [unquote({field, pattern}) | @white_list]
-    end
-  end
+  @doc """
+  Creates the authorization rules that are checked by with_auth. 
+  
+  It's important to note that the last rule that matches will the current request will be the one that goes through.
+  
+  #### field (atom)
 
-  defmacro authorize(field, pattern, whitelist) do
+  The first parameter is an atom corresponds to the field in your schema. If you have multiple schemas with the same field (like a query and a mutation) - the authorization rules will apply to both.
+
+  #### pattern (struct or function)
+
+  Structs are compared to info.context.current_user, assuming you followed the strategy outlined here.
+
+  Functions have have access to resource and info parameter. Info is the same map that is passed in to the resolver. Resource is actually the result of the resolver returning as if it was authorized. Keep this in mind for mutations, I haven't figured out an elegant way to avoid this for now.
+
+  #### whitelist (list)
+
+  If specified, the whitelist nils any values from the result of the resolver if they do not match the structure of the list provided. If the result is a list, it will apply it to all objects in the list.
+  
+  ##### Simple Example
+
+  ``` elixir
+  authorize :user, %{}, [:name, :username]
+
+  # result from resolver
+  %{
+    id: 3,
+    name: "Greg",
+    email: "climbinggreg@foo.com",
+    username: "climber_guy123"
+  }
+
+  # filtered result
+  %{
+    id: nil,
+    name: "Greg",
+    email: nil,
+    username: "climber_guy123"
+  }
+  ```
+
+  ##### Nested Example
+
+  ``` elixir
+  # rule
+  authorize :user, %User{}, [:name, {:posts, [:title, :body, {:comments, [:body]}]}]
+
+  # result from resolver
+  %{
+    id: 3, 
+    name: "Greg", 
+    email: "climbinggreg@foo.com", 
+    posts: [
+      %{
+        id: 1,
+        title: "This is my first post!", 
+        body: "This is the best post ever!",
+        comments: [
+          %{
+            id: 555,
+            body: "This is an interesting comment"
+          }
+        ]
+      }
+    ],
+    company: %{
+      id: 200, 
+      name: "Foo Productions",
+      industry: "Film"
+    }
+  }
+
+  # filtered result from resolver
+  %{
+    id: nil, 
+    name: "Greg", 
+    email: nil, 
+    posts: [
+      %{
+        id: nil,
+        title: "This is my first post!", 
+        body: "This is the best post ever!",
+        comments: [
+          %{
+            id: nil,
+            body: "This is an interesting comment"
+          }
+        ]
+      }
+    ],
+    company: nil
+  }
+  ```
+
+
+  """
+  defmacro authorize(field, pattern, whitelist \\ []) do
     quote do
       field = unquote(field)
       pattern = unquote(pattern)
@@ -76,8 +166,8 @@ defmodule Blanka do
 
         case matched_rule do
           nil -> {:error, "Unauthorized"}
+          {_field, _pattern, []} -> resolver.(attributes, info)
           {_field, _pattern, whitelist} -> filter_params(whitelist, resolver.(attributes, info))
-          {_field, _pattern} -> resolver.(attributes, info)
         end
       end
     end
