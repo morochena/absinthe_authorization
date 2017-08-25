@@ -41,12 +41,12 @@ Wrap your resolvers with the `with_auth` function:
 
 ``` elixir
 @desc "Get a user of the blog"
-    field :user, type: :user do
-      arg :id, non_null(:id)
-      resolve fn attributes, info -> 
-        with_auth(:user, attributes, info, &BlogWeb.UserResolver.find/2)
-      end 
-    end
+field :user, type: :user do
+  arg :id, non_null(:id)
+  resolve fn attributes, info -> 
+    with_auth(:user, attributes, info, &BlogWeb.UserResolver.find/2)
+  end 
+end
 ```
 
 ## Authorize 
